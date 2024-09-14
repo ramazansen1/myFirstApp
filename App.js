@@ -16,24 +16,21 @@ const App = () => {
   const [tasks, setTasks] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
 
-  const controllTask = () => {
-    if (task.trim() === "") {
-      Alert.alert("Uyarı", "Boş görev girilemez");
-    }
-    return;
-  };
-
   const addOrEditTask = () => {
-    controllTask(); // input controll func
+    if (task.trim() === "") {
+      Alert.alert("Fehler", "Die Aufgabe darf nicht leer sein");
+      return;
+    }
 
-    // eğer düzenleme modundaysak, görevi güncelle
+    // Update Aufgabe
     if (editIndex !== null) {
       const updatedTasks = [...tasks];
       updatedTasks[editIndex] = task;
       setTasks(updatedTasks);
-      setEditIndex(null); // düzenlemeden çık
+
+      setEditIndex(null); // Bearbeiten beenden
     }
-    // Yeni görev ekle
+    // Aufgabe hinzufügen
     else {
       setTasks([...tasks, task]);
     }
@@ -42,13 +39,13 @@ const App = () => {
   };
 
   const deleteTask = (index) => {
-    // seçilen indexdeki görevi sil
+    // ausgewählte Aufgabe löschen
     const filteredTasks = tasks.filter((_, i) => i !== index);
     setTasks(filteredTasks);
   };
 
   const editTask = (index) => {
-    // düzenleme moduna geç: Seçilen görevi Input'a geri yükle
+    // welschen Bearbeitungmode: ausgewählte Aufgabe in Input laden
     setTask(tasks[index]);
     setEditIndex(index);
   };
