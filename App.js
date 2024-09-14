@@ -8,36 +8,84 @@ import {
   Pressable,
   FlatList,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 
 const App = () => {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
 
-  const addTask = () => {
+  const controllTask = () => {
     if (task.trim() === "") {
       Alert.alert("Uyarı", "Boş görev girilemez");
-      return;
+    }
+    return;
+  };
+
+  const addOrEditTask = () => {
+    controllTask(); // input controll func
+
+    // eğer düzenleme modundaysak, görevi güncelle
+    if (editIndex !== null) {
+      const updatedTasks = [...tasks];
+      updatedTasks[editIndex] = task;
+      setTasks(updatedTasks);
+      setEditIndex(null); // düzenlemeden çık
+    }
+    // Yeni görev ekle
+    else {
+      setTasks([...tasks, task]);
     }
 
-    setTasks([...tasks, task]);
     setTask("");
   };
+
+  const deleteTask = (index) => {
+    // seçilen indexdeki görevi sil
+    const filteredTasks = tasks.filter((_, i) => i !== index);
+    setTasks(filteredTasks);
+  };
+
+  const editTask = (index) => {
+    // düzenleme moduna geç: Seçilen görevi Input'a geri yükle
+    setTask(tasks[index]);
+    setEditIndex(index);
+  };
+
   return (
     <View style={styles.conteiner}>
-      <Text style={styles.text}>Görev Listesi</Text>
+      <Text style={styles.text}>Task List</Text>
       <TextInput
         style={styles.input}
-        placeholder="Görev Ekleniyiz"
+        placeholder="Enter a Task..."
         value={task}
         onChangeText={setTask}
       />
-      <Pressable onPress={addTask} style={styles.button}>
-        <Text style={styles.buttonText}>Görev Ekle</Text>
+
+      <Pressable onPress={addOrEditTask} style={styles.button}>
+        <Text style={styles.buttonText}>
+          {editIndex !== null ? "Update Task " : "Add Task"}
+        </Text>
       </Pressable>
       <FlatList
         data={tasks}
-        renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
+        renderItem={({ item, index }) => (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 5,
+              backgroundColor: "pink",
+              borderRadius: 10,
+            }}
+          >
+            <TouchableOpacity onPress={() => editTask(index)}>
+              <Text style={styles.item}>{item}</Text>
+            </TouchableOpacity>
+            <Button title="Delete" onPress={() => deleteTask(index)} />
+          </View>
+        )}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>
@@ -80,6 +128,7 @@ const styles = StyleSheet.create({
   item: {
     fontSize: 16,
     marginTop: 10,
+    paddingHorizontal: 10,
   },
 });
 
